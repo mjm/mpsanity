@@ -9,6 +9,7 @@ go_library(
     srcs = [
         "client.go",
         "doc.go",
+        "mutate.go",
         "query.go",
         "result.go",
         "trace.go",

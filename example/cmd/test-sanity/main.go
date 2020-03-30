@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/mjm/mpsanity"
@@ -15,6 +16,7 @@ var (
 	dataset   = flag.String("dataset", "production", "Sanity dataset name")
 	docID     = flag.String("doc", "", "Sanity document ID to fetch")
 	query     = flag.String("query", "", "Sanity query to run")
+	mutate    = flag.Bool("mutate", false, "Test mutations")
 )
 
 func main() {
@@ -43,5 +45,35 @@ func main() {
 		}
 
 		fmt.Printf("%+v\n", res)
+	} else if *mutate {
+		sanity.Token = os.Getenv("SANITY_TOKEN")
+
+		var doc struct {
+			Type        string                   `json:"_type"`
+			Body        []map[string]interface{} `json:"body"`
+			PublishedAt time.Time                `json:"publishedAt"`
+			Slug        mpsanity.Slug            `json:"slug"`
+		}
+		doc.Type = "micropost"
+		doc.Slug = mpsanity.Slug(fmt.Sprintf("test-post-%d", time.Now().Unix()))
+		doc.PublishedAt = time.Now()
+		doc.Body = []map[string]interface{}{
+			{
+				"_type": "block",
+				"style": "normal",
+				"children": []map[string]interface{}{
+					{
+						"_type": "span",
+						"text":  "This is some content.",
+					},
+				},
+			},
+		}
+
+		if err := sanity.Txn().Create(doc).Commit(context.Background()); err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println("Mutation applied.")
 	}
 }

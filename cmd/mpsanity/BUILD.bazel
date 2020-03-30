@@ -1,0 +1,21 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["main.go"],
+    importpath = "github.com/mjm/mpsanity/cmd/mpsanity",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//:go_default_library",
+        "//mpapi:go_default_library",
+        "@io_opentelemetry_go_otel//api/global:go_default_library",
+        "@io_opentelemetry_go_otel//exporters/trace/stdout:go_default_library",
+        "@io_opentelemetry_go_otel//sdk/trace:go_default_library",
+    ],
+)
+
+go_binary(
+    name = "mpsanity",
+    embed = [":go_default_library"],
+    visibility = ["//visibility:public"],
+)

@@ -1,0 +1,20 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "config.go",
+        "media.go",
+        "micropub.go",
+        "serve.go",
+        "trace.go",
+    ],
+    importpath = "github.com/mjm/mpsanity/mpapi",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:go_default_library",
+        "@com_github_mjm_courier_js//pkg/tracehttp:go_default_library",
+        "@io_opentelemetry_go_otel//api/global:go_default_library",
+        "@io_opentelemetry_go_otel//api/trace:go_default_library",
+    ],
+)

@@ -10,6 +10,7 @@ import (
 
 	"github.com/mjm/mpsanity"
 	"github.com/mjm/mpsanity/block"
+	"github.com/mjm/mpsanity/patch"
 )
 
 var (
@@ -53,29 +54,37 @@ func main() {
 	} else if *mutate {
 		sanity.Token = os.Getenv("SANITY_TOKEN")
 
-		var doc struct {
-			Type        string                   `json:"_type"`
-			Body        []map[string]interface{} `json:"body"`
-			PublishedAt time.Time                `json:"publishedAt"`
-			Slug        mpsanity.Slug            `json:"slug"`
-		}
-		doc.Type = "micropost"
-		doc.Slug = mpsanity.Slug(fmt.Sprintf("test-post-%d", time.Now().Unix()))
-		doc.PublishedAt = time.Now()
-		doc.Body = []map[string]interface{}{
-			{
-				"_type": "block",
-				"style": "normal",
-				"children": []map[string]interface{}{
-					{
-						"_type": "span",
-						"text":  "This is some content.",
-					},
-				},
-			},
-		}
+		// var doc struct {
+		// 	Type        string                   `json:"_type"`
+		// 	Body        []map[string]interface{} `json:"body"`
+		// 	PublishedAt time.Time                `json:"publishedAt"`
+		// 	Slug        mpsanity.Slug            `json:"slug"`
+		// }
+		// doc.Type = "micropost"
+		// doc.Slug = mpsanity.Slug(fmt.Sprintf("test-post-%d", time.Now().Unix()))
+		// doc.PublishedAt = time.Now()
+		// doc.Body = []map[string]interface{}{
+		// 	{
+		// 		"_type": "block",
+		// 		"style": "normal",
+		// 		"children": []map[string]interface{}{
+		// 			{
+		// 				"_type": "span",
+		// 				"text":  "This is some content.",
+		// 			},
+		// 		},
+		// 	},
+		// }
+		//
+		// if err := sanity.Txn().Create(doc).Commit(context.Background()); err != nil {
+		// 	log.Fatal(err)
+		// }
 
-		if err := sanity.Txn().Create(doc).Commit(context.Background()); err != nil {
+		if err := sanity.Txn().Patch("Jk1HkXoAIFyd382ZShFZ1s",
+			patch.Set("slug.current", "this-is-a-test"),
+			patch.InsertAfter("body[0]",
+				block.New("normal", block.Text("This is another paragraph")))).
+			Commit(context.Background()); err != nil {
 			log.Fatal(err)
 		}
 

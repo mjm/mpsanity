@@ -8,6 +8,8 @@ import (
 	"net/http"
 
 	"go.opentelemetry.io/otel/api/trace"
+
+	"github.com/mjm/mpsanity/patch"
 )
 
 func (c *Client) Txn() *Txn {
@@ -20,11 +22,11 @@ type Txn struct {
 }
 
 type mutation struct {
-	Create            interface{} `json:"create,omitempty"`
-	CreateOrReplace   interface{} `json:"createOrReplace,omitempty"`
-	CreateIfNotExists interface{} `json:"createIfNotExists,omitempty"`
-	Delete            *deletion   `json:"delete,omitempty"`
-	// TODO patch
+	Create            interface{}        `json:"create,omitempty"`
+	CreateOrReplace   interface{}        `json:"createOrReplace,omitempty"`
+	CreateIfNotExists interface{}        `json:"createIfNotExists,omitempty"`
+	Delete            *deletion          `json:"delete,omitempty"`
+	Patch             *patch.Description `json:"patch,omitempty"`
 }
 
 type deletion struct {
@@ -56,6 +58,43 @@ func (t *Txn) CreateIfNotExists(doc interface{}) *Txn {
 func (t *Txn) Delete(id string) *Txn {
 	t.mutations = append(t.mutations, mutation{
 		Delete: &deletion{ID: id},
+	})
+	return t
+}
+
+func (t *Txn) DeleteQuery(q string) *Txn {
+	t.mutations = append(t.mutations, mutation{
+		Delete: &deletion{Query: q},
+	})
+	return t
+}
+
+func (t *Txn) Patch(id string, patches ...patch.Patch) *Txn {
+	p := &patch.Description{
+		ID: id,
+	}
+
+	for _, patcher := range patches {
+		patcher.Apply(p)
+	}
+
+	t.mutations = append(t.mutations, mutation{
+		Patch: p,
+	})
+	return t
+}
+
+func (t *Txn) PatchQuery(q string, patches ...patch.Patch) *Txn {
+	p := &patch.Description{
+		Query: q,
+	}
+
+	for _, patcher := range patches {
+		patcher.Apply(p)
+	}
+
+	t.mutations = append(t.mutations, mutation{
+		Patch: p,
 	})
 	return t
 }

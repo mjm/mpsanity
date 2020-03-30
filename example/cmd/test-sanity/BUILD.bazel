@@ -8,6 +8,7 @@ go_library(
     deps = [
         "//:go_default_library",
         "//block:go_default_library",
+        "//patch:go_default_library",
     ],
 )
 

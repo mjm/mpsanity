@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/mjm/mpsanity"
+	"github.com/mjm/mpsanity/block"
 )
 
 var (
@@ -29,9 +30,9 @@ func main() {
 
 	if *docID != "" {
 		var doc struct {
-			Body        []map[string]interface{} `json:"body"`
-			PublishedAt time.Time                `json:"publishedAt"`
-			Slug        mpsanity.Slug            `json:"slug"`
+			Body        []block.Block `json:"body"`
+			PublishedAt time.Time     `json:"publishedAt"`
+			Slug        mpsanity.Slug `json:"slug"`
 		}
 		if err := sanity.Doc(context.Background(), *docID, &doc); err != nil {
 			log.Fatal(err)
@@ -39,7 +40,11 @@ func main() {
 
 		fmt.Printf("%+v\n", doc)
 	} else if *query != "" {
-		var res interface{}
+		var res []struct {
+			Body        []block.Block `json:"body"`
+			PublishedAt time.Time     `json:"publishedAt"`
+			Slug        mpsanity.Slug `json:"slug"`
+		}
 		if err := sanity.Query(context.Background(), *query, &res); err != nil {
 			log.Fatal(err)
 		}

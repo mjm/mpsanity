@@ -5,7 +5,10 @@ go_library(
     srcs = ["main.go"],
     importpath = "github.com/mjm/mpsanity/example/cmd/test-sanity",
     visibility = ["//visibility:private"],
-    deps = ["//:go_default_library"],
+    deps = [
+        "//:go_default_library",
+        "//block:go_default_library",
+    ],
 )
 
 go_binary(

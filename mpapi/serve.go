@@ -9,15 +9,22 @@ import (
 )
 
 type MicropubHandler struct {
-	Sanity *mpsanity.Client
-	mux    *http.ServeMux
+	Sanity     *mpsanity.Client
+	docBuilder DocumentBuilder
+	mux        *http.ServeMux
 }
 
-func New(sanity *mpsanity.Client) *MicropubHandler {
+func New(sanity *mpsanity.Client, opts ...Option) *MicropubHandler {
 	h := &MicropubHandler{
-		Sanity: sanity,
-		mux:    http.NewServeMux(),
+		Sanity:     sanity,
+		docBuilder: &DefaultDocumentBuilder{},
+		mux:        http.NewServeMux(),
 	}
+
+	for _, o := range opts {
+		o.Apply(h)
+	}
+
 	h.mux.HandleFunc("/micropub/media", h.handleMedia)
 	h.mux.HandleFunc("/micropub", h.handleMicropub)
 	return h
@@ -29,4 +36,18 @@ func (h *MicropubHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	r = r.WithContext(ctx)
 	tracehttp.WrapHandler(h.mux).ServeHTTP(w, r)
+}
+
+type Option interface {
+	Apply(h *MicropubHandler)
+}
+
+type optionFn func(h *MicropubHandler)
+
+func (f optionFn) Apply(h *MicropubHandler) { f(h) }
+
+func WithDocumentBuilder(b DocumentBuilder) Option {
+	return optionFn(func(h *MicropubHandler) {
+		h.docBuilder = b
+	})
 }

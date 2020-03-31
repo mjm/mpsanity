@@ -4,6 +4,8 @@ go_library(
     name = "go_default_library",
     srcs = [
         "config.go",
+        "document.go",
+        "json.go",
         "media.go",
         "micropub.go",
         "serve.go",
@@ -13,8 +15,12 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//:go_default_library",
+        "//block:go_default_library",
         "@com_github_mjm_courier_js//pkg/tracehttp:go_default_library",
         "@io_opentelemetry_go_otel//api/global:go_default_library",
+        "@io_opentelemetry_go_otel//api/key:go_default_library",
         "@io_opentelemetry_go_otel//api/trace:go_default_library",
+        "@org_golang_google_grpc//codes:go_default_library",
+        "@org_golang_google_grpc//status:go_default_library",
     ],
 )

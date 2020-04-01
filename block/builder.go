@@ -21,6 +21,8 @@ func (b *Builder) EndBlock() {
 		return
 	}
 
+	b.EndSpan()
+
 	if bc, ok := b.current.Content.(*BlockContent); ok && len(bc.Children) == 0 {
 		return
 	}
@@ -64,12 +66,10 @@ func (b *Builder) EndSpan() {
 func (b *Builder) AppendText(text string) {
 	if b.curSpan == nil {
 		b.StartSpan()
-		b.AppendText(text)
-		b.EndSpan()
-	} else {
-		sc := b.curSpan.Content.(*SpanContent)
-		sc.Text += text
 	}
+
+	sc := b.curSpan.Content.(*SpanContent)
+	sc.Text += text
 }
 
 func (b *Builder) StartList(listItem string) {

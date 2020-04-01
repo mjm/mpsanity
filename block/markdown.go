@@ -22,6 +22,9 @@ func FromMarkdown(s string) ([]Block, error) {
 			break
 		case blackfriday.Paragraph:
 			if node.Parent != nil && node.Parent.Type == blackfriday.Item {
+				if entering && node.Prev != nil {
+					b.AppendText("\n\n")
+				}
 				break
 			}
 

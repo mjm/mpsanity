@@ -376,6 +376,65 @@ Now there's a paragraph at the end.
 				},
 			},
 		},
+		{
+			name: "lists with paragraphs",
+			input: `* This is a first paragraph
+
+    This should be part of the same list items
+
+* Another list item
+* A final list item`,
+			output: []Block{
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "This is a first paragraph\n\nThis should be part of the same list items",
+								},
+							},
+						},
+						ListItem: "bullet",
+						Level:    1,
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "Another list item",
+								},
+							},
+						},
+						ListItem: "bullet",
+						Level:    1,
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "A final list item",
+								},
+							},
+						},
+						ListItem: "bullet",
+						Level:    1,
+					},
+				},
+			},
+		},
 	}
 
 	for _, c := range cases {

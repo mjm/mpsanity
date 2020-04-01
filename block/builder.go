@@ -8,9 +8,7 @@ type Builder struct {
 }
 
 func (b *Builder) StartBlock(style string) {
-	if b.current != nil {
-		b.EndBlock()
-	}
+	b.EndBlock()
 
 	newBlock := New(style)
 	b.current = &newBlock
@@ -32,9 +30,8 @@ func (b *Builder) EndBlock() {
 }
 
 func (b *Builder) StartSpan(marks ...string) {
-	if b.curSpan != nil {
-		b.EndSpan()
-	}
+	b.EndSpan()
+
 	b.curSpan = &Block{
 		Type: "span",
 		Content: &SpanContent{
@@ -93,6 +90,15 @@ func (b *Builder) StartListItem() {
 
 func (b *Builder) EndListItem() {
 	b.EndBlock()
+}
+
+func (b *Builder) AddCustomBlock(typeName string, content interface{}) {
+	b.EndBlock()
+
+	b.bs = append(b.bs, Block{
+		Type:    typeName,
+		Content: content,
+	})
 }
 
 func (b *Builder) Blocks() []Block {

@@ -435,6 +435,186 @@ Now there's a paragraph at the end.
 				},
 			},
 		},
+		{
+			name: "blockquotes",
+			input: `> A first line of blockquoted material
+
+A paragraph in-between
+
+> First quoted paragraph
+>
+> Second quoted paragraph`,
+			output: []Block{
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "quote",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "A first line of blockquoted material",
+								},
+							},
+						},
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "A paragraph in-between",
+								},
+							},
+						},
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "quote",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "First quoted paragraph\n\nSecond quoted paragraph",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "indented code blocks",
+			input: `A normal paragraph
+
+    const foo = 1
+    const bar = 2
+
+A following paragraph`,
+			output: []Block{
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "A normal paragraph",
+								},
+							},
+						},
+					},
+				},
+				{
+					Type: "code",
+					Content: &CodeContent{
+						Code: "const foo = 1\nconst bar = 2",
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "A following paragraph",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:  "fenced code blocks",
+			input: "A normal paragraph\n\n```\nconst foo = 1\nconst bar = 2\n```\n\nA following paragraph",
+			output: []Block{
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "A normal paragraph",
+								},
+							},
+						},
+					},
+				},
+				{
+					Type: "code",
+					Content: &CodeContent{
+						Code: "const foo = 1\nconst bar = 2",
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "A following paragraph",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:  "fenced code blocks with language",
+			input: "A normal paragraph\n\n```js\nconst foo = 1\nconst bar = 2\n```\n\nA following paragraph",
+			output: []Block{
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "A normal paragraph",
+								},
+							},
+						},
+					},
+				},
+				{
+					Type: "code",
+					Content: &CodeContent{
+						Language: "js",
+						Code:     "const foo = 1\nconst bar = 2",
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "A following paragraph",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, c := range cases {

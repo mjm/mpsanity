@@ -2,26 +2,28 @@ package block
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/russross/blackfriday/v2"
 )
 
 func FromMarkdown(s string) ([]Block, error) {
-	root := blackfriday.New().Parse([]byte(s))
+	root := blackfriday.New(blackfriday.WithExtensions(blackfriday.CommonExtensions)).Parse([]byte(s))
 
 	var b Builder
 
 	root.Walk(func(node *blackfriday.Node, entering bool) blackfriday.WalkStatus {
-		if entering {
-			fmt.Printf("entering %s\n", node.Type.String())
-		} else {
-			fmt.Printf("exiting %s\n", node.Type.String())
-		}
+		// if entering {
+		// 	fmt.Printf("entering %s\n", node.Type.String())
+		// } else {
+		// 	fmt.Printf("exiting %s\n", node.Type.String())
+		// }
 		switch node.Type {
 		case blackfriday.Document:
 			break
 		case blackfriday.Paragraph:
-			if node.Parent != nil && node.Parent.Type == blackfriday.Item {
+			if node.Parent != nil &&
+				(node.Parent.Type == blackfriday.Item || node.Parent.Type == blackfriday.BlockQuote) {
 				if entering && node.Prev != nil {
 					b.AppendText("\n\n")
 				}
@@ -74,6 +76,17 @@ func FromMarkdown(s string) ([]Block, error) {
 			} else {
 				b.EndListItem()
 			}
+		case blackfriday.BlockQuote:
+			if entering {
+				b.StartBlock("quote")
+			} else {
+				b.EndBlock()
+			}
+		case blackfriday.CodeBlock:
+			b.AddCustomBlock("code", &CodeContent{
+				Language: string(node.Info),
+				Code:     strings.TrimSuffix(string(node.Literal), "\n"),
+			})
 		}
 
 		return blackfriday.GoToNext

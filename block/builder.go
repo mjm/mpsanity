@@ -1,9 +1,10 @@
 package block
 
 type Builder struct {
-	bs      []Block
-	current *Block
-	curSpan *Block
+	bs            []Block
+	current       *Block
+	curSpan       *Block
+	listItemStack []string
 }
 
 func (b *Builder) StartBlock(style string) {
@@ -17,6 +18,10 @@ func (b *Builder) StartBlock(style string) {
 
 func (b *Builder) EndBlock() {
 	if b.current == nil {
+		return
+	}
+
+	if bc, ok := b.current.Content.(*BlockContent); ok && len(bc.Children) == 0 {
 		return
 	}
 
@@ -65,6 +70,29 @@ func (b *Builder) AppendText(text string) {
 		sc := b.curSpan.Content.(*SpanContent)
 		sc.Text += text
 	}
+}
+
+func (b *Builder) StartList(listItem string) {
+	b.listItemStack = append(b.listItemStack, listItem)
+}
+
+func (b *Builder) EndList() {
+	b.listItemStack = b.listItemStack[:len(b.listItemStack)-1]
+}
+
+func (b *Builder) StartListItem() {
+	if len(b.listItemStack) == 0 {
+		return
+	}
+
+	b.StartBlock("normal")
+	bc := b.current.Content.(*BlockContent)
+	bc.ListItem = b.listItemStack[len(b.listItemStack)-1]
+	bc.Level = len(b.listItemStack)
+}
+
+func (b *Builder) EndListItem() {
+	b.EndBlock()
 }
 
 func (b *Builder) Blocks() []Block {

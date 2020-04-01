@@ -196,6 +196,186 @@ And a paragraph underneath
 				},
 			},
 		},
+		{
+			name: "unordered lists",
+			input: `* Unordered list
+* Second item
+    * Second level item
+    * Another one
+* Back to the first level
+    * End on a second level item
+
+Now there's a paragraph at the end.
+`,
+			output: []Block{
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "Unordered list",
+								},
+							},
+						},
+						ListItem: "bullet",
+						Level:    1,
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "Second item",
+								},
+							},
+						},
+						ListItem: "bullet",
+						Level:    1,
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "Second level item",
+								},
+							},
+						},
+						ListItem: "bullet",
+						Level:    2,
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "Another one",
+								},
+							},
+						},
+						ListItem: "bullet",
+						Level:    2,
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "Back to the first level",
+								},
+							},
+						},
+						ListItem: "bullet",
+						Level:    1,
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "End on a second level item",
+								},
+							},
+						},
+						ListItem: "bullet",
+						Level:    2,
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "Now there's a paragraph at the end.",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "ordered lists",
+			input: `1. First item
+2. Second item
+3. Third item`,
+			output: []Block{
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "First item",
+								},
+							},
+						},
+						ListItem: "number",
+						Level:    1,
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "Second item",
+								},
+							},
+						},
+						ListItem: "number",
+						Level:    1,
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "Third item",
+								},
+							},
+						},
+						ListItem: "number",
+						Level:    1,
+					},
+				},
+			},
+		},
 	}
 
 	for _, c := range cases {

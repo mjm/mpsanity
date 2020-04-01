@@ -12,11 +12,19 @@ func FromMarkdown(s string) ([]Block, error) {
 	var b Builder
 
 	root.Walk(func(node *blackfriday.Node, entering bool) blackfriday.WalkStatus {
-		fmt.Println(node.Type.String())
+		if entering {
+			fmt.Printf("entering %s\n", node.Type.String())
+		} else {
+			fmt.Printf("exiting %s\n", node.Type.String())
+		}
 		switch node.Type {
 		case blackfriday.Document:
 			break
 		case blackfriday.Paragraph:
+			if node.Parent != nil && node.Parent.Type == blackfriday.Item {
+				break
+			}
+
 			if entering {
 				b.StartBlock("normal")
 			} else {
@@ -47,6 +55,22 @@ func FromMarkdown(s string) ([]Block, error) {
 			b.StartSpan("code")
 			b.AppendText(string(node.Literal))
 			b.EndSpan()
+		case blackfriday.List:
+			if entering {
+				if node.ListFlags&blackfriday.ListTypeOrdered != 0 {
+					b.StartList("number")
+				} else {
+					b.StartList("bullet")
+				}
+			} else {
+				b.EndList()
+			}
+		case blackfriday.Item:
+			if entering {
+				b.StartListItem()
+			} else {
+				b.EndListItem()
+			}
 		}
 
 		return blackfriday.GoToNext

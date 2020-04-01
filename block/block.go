@@ -88,6 +88,8 @@ type BlockContent struct {
 	Style    string    `json:"style"`
 	Children []Block   `json:"children"`
 	MarkDefs []MarkDef `json:"markDefs"`
+	ListItem string    `json:"listItem,omitempty"`
+	Level    int       `json:"level,omitempty"`
 }
 
 type BlockOption interface {

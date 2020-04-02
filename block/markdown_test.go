@@ -615,6 +615,133 @@ A following paragraph`,
 				},
 			},
 		},
+		{
+			name: "links",
+			input: `Here are some [link examples](http://example.org/).
+
+Can we [include _formatting_](/foo/bar) inside the links?
+
+Links can be [done][] with footnotes too.
+
+[done]: /foo/bar`,
+			output: []Block{
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "Here are some ",
+								},
+							},
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text:  "link examples",
+									Marks: []string{"mark1"},
+								},
+							},
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: ".",
+								},
+							},
+						},
+						MarkDefs: []MarkDef{
+							{
+								Type: "link",
+								Key:  "mark1",
+								Data: &LinkData{
+									Href: "http://example.org/",
+								},
+							},
+						},
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "Can we ",
+								},
+							},
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text:  "include ",
+									Marks: []string{"mark1"},
+								},
+							},
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text:  "formatting",
+									Marks: []string{"emphasis", "mark1"},
+								},
+							},
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: " inside the links?",
+								},
+							},
+						},
+						MarkDefs: []MarkDef{
+							{
+								Type: "link",
+								Key:  "mark1",
+								Data: &LinkData{
+									Href: "/foo/bar",
+								},
+							},
+						},
+					},
+				},
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "Links can be ",
+								},
+							},
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text:  "done",
+									Marks: []string{"mark1"},
+								},
+							},
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: " with footnotes too.",
+								},
+							},
+						},
+						MarkDefs: []MarkDef{
+							{
+								Type: "link",
+								Key:  "mark1",
+								Data: &LinkData{
+									Href: "/foo/bar",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, c := range cases {

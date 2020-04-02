@@ -12,6 +12,7 @@ func FromMarkdown(s string) ([]Block, error) {
 
 	var b Builder
 
+	var lastLinkKey string
 	root.Walk(func(node *blackfriday.Node, entering bool) blackfriday.WalkStatus {
 		// if entering {
 		// 	fmt.Printf("entering %s\n", node.Type.String())
@@ -46,20 +47,20 @@ func FromMarkdown(s string) ([]Block, error) {
 			b.AppendText(string(node.Literal))
 		case blackfriday.Emph:
 			if entering {
-				b.StartSpan("emphasis")
+				b.StartMark("emphasis")
 			} else {
-				b.EndSpan()
+				b.EndMark("emphasis")
 			}
 		case blackfriday.Strong:
 			if entering {
-				b.StartSpan("strong")
+				b.StartMark("strong")
 			} else {
-				b.EndSpan()
+				b.EndMark("strong")
 			}
 		case blackfriday.Code:
-			b.StartSpan("code")
+			b.StartMark("code")
 			b.AppendText(string(node.Literal))
-			b.EndSpan()
+			b.EndMark("code")
 		case blackfriday.List:
 			if entering {
 				if node.ListFlags&blackfriday.ListTypeOrdered != 0 {
@@ -87,6 +88,15 @@ func FromMarkdown(s string) ([]Block, error) {
 				Language: string(node.Info),
 				Code:     strings.TrimSuffix(string(node.Literal), "\n"),
 			})
+		case blackfriday.Link:
+			if entering {
+				lastLinkKey = b.AddMarkDef("link", &LinkData{
+					Href: string(node.Destination),
+				})
+				b.StartMark(lastLinkKey)
+			} else {
+				b.EndMark(lastLinkKey)
+			}
 		}
 
 		return blackfriday.GoToNext

@@ -1,5 +1,9 @@
 package block
 
+import (
+	"fmt"
+)
+
 type Builder struct {
 	bs            []Block
 	current       *Block
@@ -29,13 +33,42 @@ func (b *Builder) EndBlock() {
 	b.current = nil
 }
 
-func (b *Builder) StartSpan(marks ...string) {
+func (b *Builder) StartMark(mark string) {
+	newMarks := []string{mark}
+	if b.curSpan != nil {
+		if sc, ok := b.curSpan.Content.(*SpanContent); ok {
+			newMarks = append(newMarks, sc.Marks...)
+		}
+		b.EndSpan()
+	}
+
+	b.curSpan = &Block{
+		Type: "span",
+		Content: &SpanContent{
+			Marks: newMarks,
+		},
+	}
+}
+
+func (b *Builder) EndMark(mark string) {
+	if b.curSpan == nil {
+		return
+	}
+
+	var newMarks []string
+	if sc, ok := b.curSpan.Content.(*SpanContent); ok {
+		for _, m := range sc.Marks {
+			if m != mark {
+				newMarks = append(newMarks, m)
+			}
+		}
+	}
 	b.EndSpan()
 
 	b.curSpan = &Block{
 		Type: "span",
 		Content: &SpanContent{
-			Marks: marks,
+			Marks: newMarks,
 		},
 	}
 }
@@ -62,7 +95,13 @@ func (b *Builder) EndSpan() {
 
 func (b *Builder) AppendText(text string) {
 	if b.curSpan == nil {
-		b.StartSpan()
+		b.curSpan = &Block{
+			Type: "span",
+			Content: &SpanContent{
+				Text: text,
+			},
+		}
+		return
 	}
 
 	sc := b.curSpan.Content.(*SpanContent)
@@ -99,6 +138,21 @@ func (b *Builder) AddCustomBlock(typeName string, content interface{}) {
 		Type:    typeName,
 		Content: content,
 	})
+}
+
+func (b *Builder) AddMarkDef(typeName string, data interface{}) string {
+	bc, ok := b.current.Content.(*BlockContent)
+	if !ok {
+		return ""
+	}
+
+	markKey := fmt.Sprintf("mark%d", len(bc.MarkDefs)+1)
+	bc.MarkDefs = append(bc.MarkDefs, MarkDef{
+		Type: typeName,
+		Key:  markKey,
+		Data: data,
+	})
+	return markKey
 }
 
 func (b *Builder) Blocks() []Block {

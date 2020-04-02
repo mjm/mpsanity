@@ -126,6 +126,10 @@ type MarkDef struct {
 	Data
 }
 
+type LinkData struct {
+	Href string `json:"href"`
+}
+
 type SpanContent struct {
 	Text  string   `json:"text"`
 	Marks []string `json:"marks"`

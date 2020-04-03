@@ -48,11 +48,11 @@ func (mc *MarkdownConverter) ToBlocks(s string) ([]Block, error) {
 
 	var lastLinkKey string
 	root.Walk(func(node *blackfriday.Node, entering bool) blackfriday.WalkStatus {
-		if entering {
-			fmt.Printf("entering %s\n", node.Type.String())
-		} else {
-			fmt.Printf("exiting %s\n", node.Type.String())
-		}
+		// if entering {
+		// 	fmt.Printf("entering %s\n", node.Type.String())
+		// } else {
+		// 	fmt.Printf("exiting %s\n", node.Type.String())
+		// }
 
 		for _, rule := range mc.rules {
 			if result, ok := rule(&b, node, entering); ok {

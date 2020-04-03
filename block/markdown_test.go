@@ -825,3 +825,51 @@ And some more content afterwards.`)
 		},
 	}, out)
 }
+
+func TestMarkdownYouTubeRule(t *testing.T) {
+	mc := NewMarkdownConverter(WithMarkdownRules(YouTubeMarkdownRule))
+
+	out, err := mc.ToBlocks(`This is some content with an embedded YouTube video.
+
+https://www.youtube.com/watch?v=TamwFUUd9Yk
+
+And some more content afterwards.`)
+	assert.NoError(t, err)
+
+	assert.Equal(t, []Block{
+		{
+			Type: "block",
+			Content: &BlockContent{
+				Style: "normal",
+				Children: []Block{
+					{
+						Type: "span",
+						Content: &SpanContent{
+							Text: "This is some content with an embedded YouTube video.",
+						},
+					},
+				},
+			},
+		},
+		{
+			Type: "youtube",
+			Content: &YouTubeContent{
+				URL: "https://www.youtube.com/watch?v=TamwFUUd9Yk",
+			},
+		},
+		{
+			Type: "block",
+			Content: &BlockContent{
+				Style: "normal",
+				Children: []Block{
+					{
+						Type: "span",
+						Content: &SpanContent{
+							Text: "And some more content afterwards.",
+						},
+					},
+				},
+			},
+		},
+	}, out)
+}

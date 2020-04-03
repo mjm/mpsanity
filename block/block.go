@@ -45,7 +45,7 @@ func (b Block) MarshalJSON() ([]byte, error) {
 			tagVals := strings.Split(field.Tag.Get("json"), ",")
 			if len(tagVals) > 1 && tagVals[1] == "omitempty" {
 				if val.FieldByName(name).IsZero() {
-					break
+					continue
 				}
 			}
 			m[tagVals[0]] = val.FieldByName(name).Interface()
@@ -140,4 +140,21 @@ type LinkData struct {
 type SpanContent struct {
 	Text  string   `json:"text"`
 	Marks []string `json:"marks"`
+}
+
+func ToPlainText(blocks []Block) string {
+	var s strings.Builder
+	for _, b := range blocks {
+		if bc, ok := b.Content.(*BlockContent); ok {
+			if s.Len() > 0 {
+				s.WriteString("\n\n")
+			}
+			for _, span := range bc.Children {
+				if sc, ok := span.Content.(*SpanContent); ok {
+					s.WriteString(sc.Text)
+				}
+			}
+		}
+	}
+	return s.String()
 }

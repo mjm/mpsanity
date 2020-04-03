@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/gosimple/slug"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -29,11 +30,18 @@ func (d *DefaultDocumentBuilder) BuildDocument(_ context.Context, input *CreateI
 	var doc defaultDocument
 	results := []interface{}{&doc}
 
+	if len(input.Props.Slug) > 0 {
+		doc.Slug = mpsanity.Slug(input.Props.Slug[0])
+	}
+
 	if len(input.Props.Name) == 0 {
 		doc.Type = "micropost"
 	} else {
 		doc.Type = "post"
 		doc.Title = input.Props.Name[0]
+		if doc.Slug == "" {
+			doc.Slug = mpsanity.Slug(slug.Make(doc.Title))
+		}
 	}
 
 	if len(input.Props.Content) > 0 {
@@ -43,15 +51,13 @@ func (d *DefaultDocumentBuilder) BuildDocument(_ context.Context, input *CreateI
 			return nil, err
 		}
 		doc.Body = out
+
+		if doc.Slug == "" {
+			doc.Slug = mpsanity.Slug(slug.Make(block.ToPlainText(doc.Body)))
+		}
 	}
 
 	// TODO photo
-
-	if len(input.Props.Slug) == 0 {
-		// TODO generate a slug
-	} else {
-		doc.Slug = mpsanity.Slug(input.Props.Slug[0])
-	}
 
 	if len(input.Props.Published) == 0 {
 		doc.PublishedAt = time.Now()

@@ -984,3 +984,17 @@ go_repository(
     sum = "h1:PdmoCO6wvbs+7yrJyMORt4/BmY5IYyJwS/kOiWx8mHo=",
     version = "v1.0.0",
 )
+
+go_repository(
+    name = "com_github_gosimple_slug",
+    importpath = "github.com/gosimple/slug",
+    sum = "h1:r5vDcYrFz9BmfIAMC829un9hq7hKM4cHUrsv36LbEqs=",
+    version = "v1.9.0",
+)
+
+go_repository(
+    name = "com_github_rainycape_unidecode",
+    importpath = "github.com/rainycape/unidecode",
+    sum = "h1:ta7tUOvsPHVHGom5hKW5VXNc2xZIkfCKP8iaqOyYtUQ=",
+    version = "v0.0.0-20150907023854-cb7f23ec59be",
+)

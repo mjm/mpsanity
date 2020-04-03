@@ -16,6 +16,7 @@ go_library(
     deps = [
         "//:go_default_library",
         "//block:go_default_library",
+        "@com_github_gosimple_slug//:go_default_library",
         "@com_github_mjm_courier_js//pkg/tracehttp:go_default_library",
         "@io_opentelemetry_go_otel//api/global:go_default_library",
         "@io_opentelemetry_go_otel//api/key:go_default_library",

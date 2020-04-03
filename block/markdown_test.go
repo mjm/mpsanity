@@ -145,6 +145,29 @@ And how about _some more?_`,
 			},
 		},
 		{
+			name: "line breaks",
+			input: `Here is some text  
+with some forced
+line breaks.  
+Let's see how they go.`,
+			output: []Block{
+				{
+					Type: "block",
+					Content: &BlockContent{
+						Style: "normal",
+						Children: []Block{
+							{
+								Type: "span",
+								Content: &SpanContent{
+									Text: "Here is some text\nwith some forced line breaks.\nLet's see how they go.",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "headings",
 			input: `# This is a heading
 

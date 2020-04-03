@@ -44,7 +44,10 @@ func FromMarkdown(s string) ([]Block, error) {
 				b.EndBlock()
 			}
 		case blackfriday.Text:
-			b.AppendText(string(node.Literal))
+			text := strings.ReplaceAll(string(node.Literal), "\n", " ")
+			b.AppendText(text)
+		case blackfriday.Hardbreak:
+			b.AppendText("\n")
 		case blackfriday.Emph:
 			if entering {
 				b.StartMark("emphasis")

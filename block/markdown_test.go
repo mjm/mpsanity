@@ -767,9 +767,11 @@ Links can be [done][] with footnotes too.
 		},
 	}
 
+	mc := NewMarkdownConverter()
+
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			out, err := FromMarkdown(c.input)
+			out, err := mc.ToBlocks(c.input)
 			assert.NoError(t, err)
 			assert.Equal(t, c.output, out)
 		})

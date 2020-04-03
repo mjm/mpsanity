@@ -7,8 +7,20 @@ import (
 	"github.com/russross/blackfriday/v2"
 )
 
-func FromMarkdown(s string) ([]Block, error) {
-	root := blackfriday.New(blackfriday.WithExtensions(blackfriday.CommonExtensions)).Parse([]byte(s))
+type MarkdownConverter struct {
+}
+
+func NewMarkdownConverter() *MarkdownConverter {
+	mc := &MarkdownConverter{}
+	return mc
+}
+
+func (mc *MarkdownConverter) newMarkdown() *blackfriday.Markdown {
+	return blackfriday.New(blackfriday.WithExtensions(blackfriday.CommonExtensions))
+}
+
+func (mc *MarkdownConverter) ToBlocks(s string) ([]Block, error) {
+	root := mc.newMarkdown().Parse([]byte(s))
 
 	var b Builder
 

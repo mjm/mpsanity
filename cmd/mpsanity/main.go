@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gosimple/slug"
 	"go.opentelemetry.io/otel/api/global"
 	"go.opentelemetry.io/otel/exporters/trace/stdout"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -22,6 +23,10 @@ var (
 
 	port = flag.String("port", "9090", "Port to listen on for HTTP")
 )
+
+func init() {
+	slug.MaxLength = 40
+}
 
 func main() {
 	flag.Parse()

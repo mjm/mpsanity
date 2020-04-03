@@ -65,6 +65,8 @@ func (d *DefaultDocumentBuilder) BuildDocument(_ context.Context, input *CreateI
 		doc.PublishedAt = input.Props.Published[0]
 	}
 
+	doc.Slug = mpsanity.Slug(doc.PublishedAt.Format("2006-01-02") + "-" + string(doc.Slug))
+
 	doc.Syndication = input.Props.Syndication
 
 	return results, nil

@@ -3,6 +3,7 @@ package block
 import (
 	"encoding/json"
 	"reflect"
+	"strings"
 )
 
 type Content interface{}
@@ -41,7 +42,13 @@ func (b Block) MarshalJSON() ([]byte, error) {
 		for i := 0; i < t.NumField(); i++ {
 			field := t.Field(i)
 			name := t.Field(i).Name
-			m[field.Tag.Get("json")] = val.FieldByName(name).Interface()
+			tagVals := strings.Split(field.Tag.Get("json"), ",")
+			if len(tagVals) > 1 && tagVals[1] == "omitempty" {
+				if val.FieldByName(name).IsZero() {
+					break
+				}
+			}
+			m[tagVals[0]] = val.FieldByName(name).Interface()
 		}
 	}
 

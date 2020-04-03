@@ -6,6 +6,7 @@ import (
 	"github.com/mjm/courier-js/pkg/tracehttp"
 
 	"github.com/mjm/mpsanity"
+	"github.com/mjm/mpsanity/block"
 )
 
 type MicropubHandler struct {
@@ -16,9 +17,11 @@ type MicropubHandler struct {
 
 func New(sanity *mpsanity.Client, opts ...Option) *MicropubHandler {
 	h := &MicropubHandler{
-		Sanity:     sanity,
-		docBuilder: &DefaultDocumentBuilder{},
-		mux:        http.NewServeMux(),
+		Sanity: sanity,
+		docBuilder: &DefaultDocumentBuilder{
+			MarkdownConverter: block.NewMarkdownConverter(),
+		},
+		mux: http.NewServeMux(),
 	}
 
 	for _, o := range opts {

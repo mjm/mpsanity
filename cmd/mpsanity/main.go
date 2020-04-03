@@ -12,6 +12,7 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 
 	"github.com/mjm/mpsanity"
+	"github.com/mjm/mpsanity/block"
 	"github.com/mjm/mpsanity/mpapi"
 )
 
@@ -43,6 +44,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	http.Handle("/", mpapi.New(sanity))
+	http.Handle("/", mpapi.New(sanity,
+		mpapi.WithDocumentBuilder(&mpapi.DefaultDocumentBuilder{
+			MarkdownConverter: block.NewMarkdownConverter(block.WithMarkdownRules(
+				block.TweetMarkdownRule,
+				block.YouTubeMarkdownRule)),
+		})))
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", *port), nil))
 }

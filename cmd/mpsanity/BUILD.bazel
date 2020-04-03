@@ -7,6 +7,7 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//:go_default_library",
+        "//block:go_default_library",
         "//mpapi:go_default_library",
         "@io_opentelemetry_go_otel//api/global:go_default_library",
         "@io_opentelemetry_go_otel//exporters/trace/stdout:go_default_library",

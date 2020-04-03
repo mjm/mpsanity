@@ -970,3 +970,17 @@ go_repository(
     sum = "h1:SvFZT6jyqRaOeXpc5h/JSfZenJ2O330aBsf7JfSUXmQ=",
     version = "v0.0.0-20190308202827-9d24e82272b4",
 )
+
+go_repository(
+    name = "com_github_russross_blackfriday_v2",
+    importpath = "github.com/russross/blackfriday/v2",
+    sum = "h1:lPqVAte+HuHNfhJ/0LC98ESWRz8afy9tM/0RK8m9o+Q=",
+    version = "v2.0.1",
+)
+
+go_repository(
+    name = "com_github_shurcool_sanitized_anchor_name",
+    importpath = "github.com/shurcooL/sanitized_anchor_name",
+    sum = "h1:PdmoCO6wvbs+7yrJyMORt4/BmY5IYyJwS/kOiWx8mHo=",
+    version = "v1.0.0",
+)

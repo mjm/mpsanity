@@ -18,6 +18,7 @@ type DocumentBuilder interface {
 }
 
 type DefaultDocumentBuilder struct {
+	MarkdownConverter *block.MarkdownConverter
 }
 
 func (d *DefaultDocumentBuilder) BuildDocument(_ context.Context, input *CreateInput) ([]interface{}, error) {
@@ -36,11 +37,12 @@ func (d *DefaultDocumentBuilder) BuildDocument(_ context.Context, input *CreateI
 	}
 
 	if len(input.Props.Content) > 0 {
-		// TODO actually process the input into blocks somehow
 		content := input.Props.Content[0]
-		doc.Body = []block.Block{
-			block.New("normal", block.Text(content)),
+		out, err := d.MarkdownConverter.ToBlocks(content)
+		if err != nil {
+			return nil, err
 		}
+		doc.Body = out
 	}
 
 	// TODO photo

@@ -8,15 +8,37 @@ import (
 )
 
 type MarkdownConverter struct {
+	rules []MarkdownRuleFunc
 }
 
-func NewMarkdownConverter() *MarkdownConverter {
+func NewMarkdownConverter(opts ...MarkdownOption) *MarkdownConverter {
 	mc := &MarkdownConverter{}
+	for _, o := range opts {
+		o.Apply(mc)
+	}
 	return mc
 }
 
 func (mc *MarkdownConverter) newMarkdown() *blackfriday.Markdown {
 	return blackfriday.New(blackfriday.WithExtensions(blackfriday.CommonExtensions))
+}
+
+type MarkdownRuleFunc func(b *Builder, node *blackfriday.Node, entering bool) (blackfriday.WalkStatus, bool)
+
+type MarkdownOption interface {
+	Apply(mc *MarkdownConverter)
+}
+
+type markdownOptionFn func(mc *MarkdownConverter)
+
+func (f markdownOptionFn) Apply(mc *MarkdownConverter) {
+	f(mc)
+}
+
+func WithMarkdownRules(rules ...MarkdownRuleFunc) MarkdownOption {
+	return markdownOptionFn(func(mc *MarkdownConverter) {
+		mc.rules = append(mc.rules, rules...)
+	})
 }
 
 func (mc *MarkdownConverter) ToBlocks(s string) ([]Block, error) {
@@ -26,11 +48,18 @@ func (mc *MarkdownConverter) ToBlocks(s string) ([]Block, error) {
 
 	var lastLinkKey string
 	root.Walk(func(node *blackfriday.Node, entering bool) blackfriday.WalkStatus {
-		// if entering {
-		// 	fmt.Printf("entering %s\n", node.Type.String())
-		// } else {
-		// 	fmt.Printf("exiting %s\n", node.Type.String())
-		// }
+		if entering {
+			fmt.Printf("entering %s\n", node.Type.String())
+		} else {
+			fmt.Printf("exiting %s\n", node.Type.String())
+		}
+
+		for _, rule := range mc.rules {
+			if result, ok := rule(&b, node, entering); ok {
+				return result
+			}
+		}
+
 		switch node.Type {
 		case blackfriday.Document:
 			break

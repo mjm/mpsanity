@@ -777,3 +777,51 @@ Links can be [done][] with footnotes too.
 		})
 	}
 }
+
+func TestMarkdownTweetRule(t *testing.T) {
+	mc := NewMarkdownConverter(WithMarkdownRules(TweetMarkdownRule))
+
+	out, err := mc.ToBlocks(`This is some content with an embedded tweet.
+
+https://twitter.com/some_user/status/1234567890
+
+And some more content afterwards.`)
+	assert.NoError(t, err)
+
+	assert.Equal(t, []Block{
+		{
+			Type: "block",
+			Content: &BlockContent{
+				Style: "normal",
+				Children: []Block{
+					{
+						Type: "span",
+						Content: &SpanContent{
+							Text: "This is some content with an embedded tweet.",
+						},
+					},
+				},
+			},
+		},
+		{
+			Type: "tweet",
+			Content: &TweetContent{
+				URL: "https://twitter.com/some_user/status/1234567890",
+			},
+		},
+		{
+			Type: "block",
+			Content: &BlockContent{
+				Style: "normal",
+				Children: []Block{
+					{
+						Type: "span",
+						Content: &SpanContent{
+							Text: "And some more content afterwards.",
+						},
+					},
+				},
+			},
+		},
+	}, out)
+}

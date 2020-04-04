@@ -23,33 +23,35 @@ func (h *MicropubHandler) handleMicropubForm(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	var rs []io.ReadCloser
-	for _, fh := range r.MultipartForm.File["photo"] {
-		f, err := fh.Open()
+	if r.MultipartForm != nil {
+		var rs []io.ReadCloser
+		for _, fh := range r.MultipartForm.File["photo"] {
+			f, err := fh.Open()
+			if err != nil {
+				respondWithError(ctx, w, err)
+				return
+			}
+
+			rs = append(rs, f)
+		}
+		for _, fh := range r.MultipartForm.File["photo[]"] {
+			f, err := fh.Open()
+			if err != nil {
+				respondWithError(ctx, w, err)
+				return
+			}
+
+			rs = append(rs, f)
+		}
+
+		imgIDs, err := h.uploadImageAssets(ctx, rs)
 		if err != nil {
 			respondWithError(ctx, w, err)
 			return
 		}
 
-		rs = append(rs, f)
+		input.Props.Photo = imgIDs
 	}
-	for _, fh := range r.MultipartForm.File["photo[]"] {
-		f, err := fh.Open()
-		if err != nil {
-			respondWithError(ctx, w, err)
-			return
-		}
-
-		rs = append(rs, f)
-	}
-
-	imgIDs, err := h.uploadImageAssets(ctx, rs)
-	if err != nil {
-		respondWithError(ctx, w, err)
-		return
-	}
-
-	input.Props.Photo = imgIDs
 
 	h.createDocument(ctx, w, input)
 }

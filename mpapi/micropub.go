@@ -69,23 +69,19 @@ func (h *MicropubHandler) handleMicropubPost(w http.ResponseWriter, r *http.Requ
 	switch mediaType {
 	case "application/json":
 		h.handleMicropubJSON(w, r)
-	case "application/x-www-form-urlencoded":
-		h.handleMicropubURLEncoded(w, r)
-	case "multipart/form-data":
-		h.handleMicropubMultipart(w, r)
+	case "application/x-www-form-urlencoded", "multipart/form-data":
+		h.handleMicropubForm(w, r)
 	}
 }
 
-func (h *MicropubHandler) handleMicropubURLEncoded(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func (h *MicropubHandler) handleMicropubMultipart(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func (h *MicropubHandler) createDocument(ctx context.Context, w http.ResponseWriter, doc Document) {
+func (h *MicropubHandler) createDocument(ctx context.Context, w http.ResponseWriter, input *CreateInput) {
 	span := trace.SpanFromContext(ctx)
+
+	doc, err := h.docBuilder.BuildDocument(ctx, input)
+	if err != nil {
+		respondWithError(ctx, w, err)
+		return
+	}
 
 	if err := h.Sanity.Txn().Create(doc).Commit(ctx); err != nil {
 		respondWithError(ctx, w, err)

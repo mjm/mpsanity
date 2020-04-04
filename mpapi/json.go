@@ -67,13 +67,7 @@ func (h *MicropubHandler) handleMicropubJSON(w http.ResponseWriter, r *http.Requ
 			input.Props.Photo = imgIDs
 		}
 
-		doc, err := h.docBuilder.BuildDocument(ctx, &input)
-		if err != nil {
-			respondWithError(ctx, w, err)
-			return
-		}
-
-		h.createDocument(ctx, w, doc)
+		h.createDocument(ctx, w, &input)
 	}
 }
 

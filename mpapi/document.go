@@ -29,22 +29,21 @@ func (d *DefaultDocumentBuilder) BuildDocument(_ context.Context, input *CreateI
 
 	var doc defaultDocument
 
-	if len(input.Props.Slug) > 0 {
-		doc.Slug = mpsanity.Slug(input.Props.Slug[0])
+	if slug := input.Slug(); slug != "" {
+		doc.Slug = mpsanity.Slug(slug)
 	}
 
-	if len(input.Props.Name) == 0 {
-		doc.Type = "micropost"
-	} else {
+	if name := input.Name(); name != "" {
 		doc.Type = "post"
-		doc.Title = input.Props.Name[0]
+		doc.Title = name
 		if doc.Slug == "" {
 			doc.Slug = mpsanity.Slug(slug.Make(doc.Title))
 		}
+	} else {
+		doc.Type = "micropost"
 	}
 
-	if len(input.Props.Content) > 0 {
-		content := input.Props.Content[0]
+	if content := input.Content(); content != "" {
 		out, err := d.MarkdownConverter.ToBlocks(content)
 		if err != nil {
 			return nil, err
@@ -56,25 +55,25 @@ func (d *DefaultDocumentBuilder) BuildDocument(_ context.Context, input *CreateI
 		}
 	}
 
-	for _, photo := range input.Props.Photo {
+	for _, photo := range input.Photos() {
 		doc.Body = append(doc.Body, block.Block{
 			Type: "mainImage",
 			Content: map[string]interface{}{
 				"alt":   "Photo",
-				"asset": mpsanity.Reference(photo),
+				"asset": photo,
 			},
 		})
 	}
 
-	if len(input.Props.Published) == 0 {
-		doc.PublishedAt = time.Now()
+	if pub := input.Published(); pub != nil {
+		doc.PublishedAt = *pub
 	} else {
-		doc.PublishedAt = input.Props.Published[0]
+		doc.PublishedAt = time.Now()
 	}
 
 	doc.Slug = mpsanity.Slug(doc.PublishedAt.Format("2006-01-02") + "-" + string(doc.Slug))
 
-	doc.Syndication = input.Props.Syndication
+	doc.Syndication = input.Syndication()
 
 	return &doc, nil
 }

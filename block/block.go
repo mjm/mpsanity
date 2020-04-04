@@ -15,7 +15,8 @@ type Block struct {
 
 func New(style string, opts ...BlockOption) Block {
 	bc := &BlockContent{
-		Style: style,
+		Style:    style,
+		MarkDefs: make([]MarkDef, 0),
 	}
 
 	for _, o := range opts {
@@ -139,7 +140,7 @@ type LinkData struct {
 
 type SpanContent struct {
 	Text  string   `json:"text"`
-	Marks []string `json:"marks"`
+	Marks []string `json:"marks,omitempty"`
 }
 
 func ToPlainText(blocks []Block) string {

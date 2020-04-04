@@ -65,15 +65,23 @@ func (h *MicropubHandler) handleMicropubJSON(w http.ResponseWriter, r *http.Requ
 			input.Props.Photo = imgIDs
 		}
 
-		docs, err := h.docBuilder.BuildDocument(ctx, &input)
+		doc, err := h.docBuilder.BuildDocument(ctx, &input)
 		if err != nil {
 			span.RecordError(ctx, err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(docs)
+		if err := h.Sanity.Txn().Create(doc).Commit(ctx); err != nil {
+			span.RecordError(ctx, err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// TODO trigger a re-deploy of the site
+
+		w.Header().Set("Location", h.baseURL+doc.URLPath())
+		w.WriteHeader(http.StatusAccepted)
 	}
 }
 

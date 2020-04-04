@@ -15,20 +15,19 @@ import (
 var ErrNotEntry = status.Error(codes.InvalidArgument, "post is not an entry")
 
 type DocumentBuilder interface {
-	BuildDocument(ctx context.Context, input *CreateInput) ([]interface{}, error)
+	BuildDocument(ctx context.Context, input *CreateInput) (Document, error)
 }
 
 type DefaultDocumentBuilder struct {
 	MarkdownConverter *block.MarkdownConverter
 }
 
-func (d *DefaultDocumentBuilder) BuildDocument(_ context.Context, input *CreateInput) ([]interface{}, error) {
+func (d *DefaultDocumentBuilder) BuildDocument(_ context.Context, input *CreateInput) (Document, error) {
 	if input.Type[0] != "entry" {
 		return nil, ErrNotEntry
 	}
 
 	var doc defaultDocument
-	results := []interface{}{&doc}
 
 	if len(input.Props.Slug) > 0 {
 		doc.Slug = mpsanity.Slug(input.Props.Slug[0])
@@ -77,14 +76,22 @@ func (d *DefaultDocumentBuilder) BuildDocument(_ context.Context, input *CreateI
 
 	doc.Syndication = input.Props.Syndication
 
-	return results, nil
+	return &doc, nil
 }
 
 type defaultDocument struct {
-	Type        string        `json:"type"`
+	Type        string        `json:"_type"`
 	Title       string        `json:"title,omitempty"`
 	Body        []block.Block `json:"body"`
 	Slug        mpsanity.Slug `json:"slug"`
 	PublishedAt time.Time     `json:"publishedAt"`
 	Syndication []string      `json:"syndication,omitempty"`
+}
+
+type Document interface {
+	URLPath() string
+}
+
+func (d *defaultDocument) URLPath() string {
+	return "/" + string(d.Slug)
 }

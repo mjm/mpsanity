@@ -20,6 +20,7 @@ import (
 var (
 	projectID = flag.String("project", "", "Sanity project ID")
 	dataset   = flag.String("dataset", "production", "Sanity dataset name")
+	baseURL   = flag.String("base-url", "", "Base URL for the website posts are published to")
 
 	port = flag.String("port", "9090", "Port to listen on for HTTP")
 )
@@ -54,6 +55,7 @@ func main() {
 			MarkdownConverter: block.NewMarkdownConverter(block.WithMarkdownRules(
 				block.TweetMarkdownRule,
 				block.YouTubeMarkdownRule)),
-		})))
+		}),
+		mpapi.WithBaseURL(*baseURL)))
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", *port), nil))
 }

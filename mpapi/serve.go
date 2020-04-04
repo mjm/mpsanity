@@ -12,6 +12,7 @@ import (
 type MicropubHandler struct {
 	Sanity     *mpsanity.Client
 	docBuilder DocumentBuilder
+	baseURL    string
 	mux        *http.ServeMux
 }
 
@@ -52,5 +53,11 @@ func (f optionFn) Apply(h *MicropubHandler) { f(h) }
 func WithDocumentBuilder(b DocumentBuilder) Option {
 	return optionFn(func(h *MicropubHandler) {
 		h.docBuilder = b
+	})
+}
+
+func WithBaseURL(u string) Option {
+	return optionFn(func(h *MicropubHandler) {
+		h.baseURL = u
 	})
 }

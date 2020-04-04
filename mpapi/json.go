@@ -7,6 +7,9 @@ import (
 	"strings"
 	"time"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/mjm/mpsanity"
 )
 
@@ -16,8 +19,7 @@ func (h *MicropubHandler) handleMicropubJSON(w http.ResponseWriter, r *http.Requ
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		span.RecordError(ctx, err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		respondWithError(ctx, w, err)
 		return
 	}
 
@@ -28,8 +30,8 @@ func (h *MicropubHandler) handleMicropubJSON(w http.ResponseWriter, r *http.Requ
 		Type   []string `json:"type"`
 	}
 	if err := json.Unmarshal(data, &typeVal); err != nil {
-		span.RecordError(ctx, err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		err = status.Error(codes.InvalidArgument, err.Error())
+		respondWithError(ctx, w, err)
 		return
 	}
 
@@ -42,8 +44,8 @@ func (h *MicropubHandler) handleMicropubJSON(w http.ResponseWriter, r *http.Requ
 
 		var input CreateInput
 		if err := json.Unmarshal(data, &input); err != nil {
-			span.RecordError(ctx, err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			err = status.Error(codes.InvalidArgument, err.Error())
+			respondWithError(ctx, w, err)
 			return
 		}
 
@@ -52,15 +54,13 @@ func (h *MicropubHandler) handleMicropubJSON(w http.ResponseWriter, r *http.Requ
 		if len(input.Props.Photo) > 0 {
 			rs, err := h.fetchImageAssets(ctx, input.Props.Photo)
 			if err != nil {
-				span.RecordError(ctx, err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				respondWithError(ctx, w, err)
 				return
 			}
 
 			imgIDs, err := h.uploadImageAssets(ctx, rs)
 			if err != nil {
-				span.RecordError(ctx, err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				respondWithError(ctx, w, err)
 				return
 			}
 
@@ -69,8 +69,7 @@ func (h *MicropubHandler) handleMicropubJSON(w http.ResponseWriter, r *http.Requ
 
 		doc, err := h.docBuilder.BuildDocument(ctx, &input)
 		if err != nil {
-			span.RecordError(ctx, err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			respondWithError(ctx, w, err)
 			return
 		}
 

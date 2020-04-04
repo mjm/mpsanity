@@ -3,6 +3,7 @@ package mpapi
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"mime"
 	"net/http"
@@ -12,16 +13,23 @@ import (
 	"go.opentelemetry.io/otel/api/key"
 	"go.opentelemetry.io/otel/api/trace"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
+var ErrMethodNotAllowed = errors.New("method not allowed")
+
 func (h *MicropubHandler) handleMicropub(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	span := trace.SpanFromContext(ctx)
+
 	switch r.Method {
 	case http.MethodGet:
 		h.handleMicropubGet(w, r)
 	case http.MethodPost:
 		h.handleMicropubPost(w, r)
 	default:
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		span.RecordError(ctx, ErrMethodNotAllowed)
+		http.Error(w, ErrMethodNotAllowed.Error(), http.StatusMethodNotAllowed)
 	}
 }
 
@@ -39,7 +47,7 @@ func (h *MicropubHandler) handleMicropubGet(w http.ResponseWriter, r *http.Reque
 			MediaEndpoint: fmt.Sprintf("https://%s/micropub/media", r.Host),
 		}
 		if err := json.NewEncoder(w).Encode(cfg); err != nil {
-			span.RecordError(ctx, err)
+			respondWithError(ctx, w, err)
 			return
 		}
 	}
@@ -54,8 +62,7 @@ func (h *MicropubHandler) handleMicropubPost(w http.ResponseWriter, r *http.Requ
 
 	mediaType, _, err := mime.ParseMediaType(mediaType)
 	if err != nil {
-		span.RecordError(ctx, err, trace.WithErrorStatus(codes.InvalidArgument))
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		respondWithError(ctx, w, status.Error(codes.InvalidArgument, err.Error()))
 		return
 	}
 
@@ -81,8 +88,7 @@ func (h *MicropubHandler) createDocument(ctx context.Context, w http.ResponseWri
 	span := trace.SpanFromContext(ctx)
 
 	if err := h.Sanity.Txn().Create(doc).Commit(ctx); err != nil {
-		span.RecordError(ctx, err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		respondWithError(ctx, w, err)
 		return
 	}
 

@@ -93,11 +93,18 @@ func (h *MicropubHandler) createDocument(ctx context.Context, w http.ResponseWri
 			"trigger_title": []string{fmt.Sprintf("Create %s", doc.URLPath())},
 		}
 		u := h.webhookURL + "?" + q.Encode()
-		res, err := http.Post(u, "application/json", strings.NewReader("{}"))
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, strings.NewReader("{}"))
 		if err != nil {
 			span.RecordError(ctx, err)
-		} else if res.StatusCode > 299 {
-			span.RecordError(ctx, fmt.Errorf("unexpected status code %d for webhook", res.StatusCode))
+		} else {
+			req.Header.Set("Content-Type", "application/json")
+			res, err := h.Sanity.HTTPClient.Do(req)
+			if err != nil {
+				span.RecordError(ctx, err)
+			} else if res.StatusCode > 299 {
+				span.RecordError(ctx, fmt.Errorf("unexpected status code %d for webhook", res.StatusCode))
+			}
 		}
 	}
 

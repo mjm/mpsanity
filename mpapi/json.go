@@ -72,16 +72,7 @@ func (h *MicropubHandler) handleMicropubJSON(w http.ResponseWriter, r *http.Requ
 			return
 		}
 
-		if err := h.Sanity.Txn().Create(doc).Commit(ctx); err != nil {
-			span.RecordError(ctx, err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		// TODO trigger a re-deploy of the site
-
-		w.Header().Set("Location", h.baseURL+doc.URLPath())
-		w.WriteHeader(http.StatusAccepted)
+		h.createDocument(ctx, w, doc)
 	}
 }
 

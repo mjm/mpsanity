@@ -13,6 +13,7 @@ type MicropubHandler struct {
 	Sanity     *mpsanity.Client
 	docBuilder DocumentBuilder
 	baseURL    string
+	webhookURL string
 	mux        *http.ServeMux
 }
 
@@ -59,5 +60,11 @@ func WithDocumentBuilder(b DocumentBuilder) Option {
 func WithBaseURL(u string) Option {
 	return optionFn(func(h *MicropubHandler) {
 		h.baseURL = u
+	})
+}
+
+func WithWebhookURL(u string) Option {
+	return optionFn(func(h *MicropubHandler) {
+		h.webhookURL = u
 	})
 }

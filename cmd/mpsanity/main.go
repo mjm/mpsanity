@@ -18,9 +18,10 @@ import (
 )
 
 var (
-	projectID = flag.String("project", "", "Sanity project ID")
-	dataset   = flag.String("dataset", "production", "Sanity dataset name")
-	baseURL   = flag.String("base-url", "", "Base URL for the website posts are published to")
+	projectID  = flag.String("project", "", "Sanity project ID")
+	dataset    = flag.String("dataset", "production", "Sanity dataset name")
+	baseURL    = flag.String("base-url", "", "Base URL for the website posts are published to")
+	webhookURL = flag.String("webhook-url", "", "Netlify webhook URL to rebuild the site")
 
 	port = flag.String("port", "9090", "Port to listen on for HTTP")
 )
@@ -56,6 +57,7 @@ func main() {
 				block.TweetMarkdownRule,
 				block.YouTubeMarkdownRule)),
 		}),
-		mpapi.WithBaseURL(*baseURL)))
+		mpapi.WithBaseURL(*baseURL),
+		mpapi.WithWebhookURL(*webhookURL)))
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", *port), nil))
 }

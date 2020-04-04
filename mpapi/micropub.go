@@ -1,10 +1,13 @@
 package mpapi
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"mime"
 	"net/http"
+	"net/url"
+	"strings"
 
 	"go.opentelemetry.io/otel/api/key"
 	"go.opentelemetry.io/otel/api/trace"
@@ -72,4 +75,30 @@ func (h *MicropubHandler) handleMicropubURLEncoded(w http.ResponseWriter, r *htt
 
 func (h *MicropubHandler) handleMicropubMultipart(w http.ResponseWriter, r *http.Request) {
 
+}
+
+func (h *MicropubHandler) createDocument(ctx context.Context, w http.ResponseWriter, doc Document) {
+	span := trace.SpanFromContext(ctx)
+
+	if err := h.Sanity.Txn().Create(doc).Commit(ctx); err != nil {
+		span.RecordError(ctx, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if h.webhookURL != "" {
+		q := url.Values{
+			"trigger_title": []string{fmt.Sprintf("Create %s", doc.URLPath())},
+		}
+		u := h.webhookURL + "?" + q.Encode()
+		res, err := http.Post(u, "application/json", strings.NewReader("{}"))
+		if err != nil {
+			span.RecordError(ctx, err)
+		} else if res.StatusCode > 299 {
+			span.RecordError(ctx, fmt.Errorf("unexpected status code %d for webhook", res.StatusCode))
+		}
+	}
+
+	w.Header().Set("Location", h.baseURL+doc.URLPath())
+	w.WriteHeader(http.StatusAccepted)
 }

@@ -55,6 +55,10 @@ func (d *DefaultDocumentBuilder) BuildDocument(_ context.Context, input *CreateI
 		}
 	}
 
+	if doc.Slug == "" {
+		doc.Slug = mpsanity.Slug(randomString(10))
+	}
+
 	for _, photo := range input.Photos() {
 		doc.Body = append(doc.Body, block.Block{
 			Type: "mainImage",

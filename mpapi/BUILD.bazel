@@ -10,6 +10,7 @@ go_library(
         "json.go",
         "media.go",
         "micropub.go",
+        "rand_string.go",
         "serve.go",
         "trace.go",
     ],

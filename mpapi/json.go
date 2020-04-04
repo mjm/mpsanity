@@ -47,6 +47,24 @@ func (h *MicropubHandler) handleMicropubJSON(w http.ResponseWriter, r *http.Requ
 
 		input.Type[0] = strings.TrimPrefix(input.Type[0], "h-")
 
+		if len(input.Props.Photo) > 0 {
+			rs, err := h.fetchImageAssets(ctx, input.Props.Photo)
+			if err != nil {
+				span.RecordError(ctx, err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			imgIDs, err := h.uploadImageAssets(ctx, rs)
+			if err != nil {
+				span.RecordError(ctx, err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			input.Props.Photo = imgIDs
+		}
+
 		docs, err := h.docBuilder.BuildDocument(ctx, &input)
 		if err != nil {
 			span.RecordError(ctx, err)

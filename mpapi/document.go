@@ -57,7 +57,15 @@ func (d *DefaultDocumentBuilder) BuildDocument(_ context.Context, input *CreateI
 		}
 	}
 
-	// TODO photo
+	for _, photo := range input.Props.Photo {
+		doc.Body = append(doc.Body, block.Block{
+			Type: "mainImage",
+			Content: map[string]interface{}{
+				"alt":   "Photo",
+				"asset": mpsanity.Reference(photo),
+			},
+		})
+	}
 
 	if len(input.Props.Published) == 0 {
 		doc.PublishedAt = time.Now()

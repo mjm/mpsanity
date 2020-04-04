@@ -7,6 +7,7 @@ gazelle(name = "gazelle")
 go_library(
     name = "go_default_library",
     srcs = [
+        "asset.go",
         "client.go",
         "doc.go",
         "mutate.go",

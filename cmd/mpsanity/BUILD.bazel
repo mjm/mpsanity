@@ -10,6 +10,7 @@ go_library(
         "//block:go_default_library",
         "//mpapi:go_default_library",
         "@com_github_gosimple_slug//:go_default_library",
+        "@com_github_mjm_courier_js//pkg/tracehttp:go_default_library",
         "@io_opentelemetry_go_otel//api/global:go_default_library",
         "@io_opentelemetry_go_otel//exporters/trace/stdout:go_default_library",
         "@io_opentelemetry_go_otel//sdk/trace:go_default_library",

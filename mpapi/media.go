@@ -20,12 +20,17 @@ func (h *MicropubHandler) fetchImageAssets(ctx context.Context, urls []string) (
 		trace.WithAttributes(key.Int("asset_count", len(urls))))
 	defer span.End()
 
-	group, _ := errgroup.WithContext(ctx)
+	group, subCtx := errgroup.WithContext(ctx)
 
 	rs := make([]io.ReadCloser, len(urls))
 	for i, u := range urls {
 		group.Go(func() error {
-			res, err := http.Get(u)
+			req, err := http.NewRequestWithContext(subCtx, http.MethodGet, u, nil)
+			if err != nil {
+				return err
+			}
+
+			res, err := h.Sanity.HTTPClient.Do(req)
 			if err != nil {
 				return err
 			}

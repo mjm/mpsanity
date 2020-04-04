@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/gosimple/slug"
+	"github.com/mjm/courier-js/pkg/tracehttp"
 	"go.opentelemetry.io/otel/api/global"
 	"go.opentelemetry.io/otel/exporters/trace/stdout"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -50,6 +51,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	sanity.HTTPClient.Transport = tracehttp.DefaultTransport
 
 	http.Handle("/", mpapi.New(sanity,
 		mpapi.WithDocumentBuilder(&mpapi.DefaultDocumentBuilder{

@@ -23,6 +23,7 @@ var (
 	dataset    = flag.String("dataset", "production", "Sanity dataset name")
 	baseURL    = flag.String("base-url", "", "Base URL for the website posts are published to")
 	webhookURL = flag.String("webhook-url", "", "Netlify webhook URL to rebuild the site")
+	tokenURL   = flag.String("token-url", "", "IndieAuth token endpoint")
 
 	port = flag.String("port", "9090", "Port to listen on for HTTP")
 )
@@ -61,6 +62,7 @@ func main() {
 				block.YouTubeMarkdownRule)),
 		}),
 		mpapi.WithBaseURL(*baseURL),
-		mpapi.WithWebhookURL(*webhookURL)))
+		mpapi.WithWebhookURL(*webhookURL),
+		mpapi.WithIndieAuth(*tokenURL, *baseURL)))
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", *port), nil))
 }

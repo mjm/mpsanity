@@ -26,7 +26,8 @@ func (h *MicropubHandler) handleMicropub(w http.ResponseWriter, r *http.Request)
 	case http.MethodGet:
 		h.handleMicropubGet(w, r)
 	case http.MethodPost:
-		h.handleMicropubPost(w, r)
+		// only require auth for the POST request
+		h.AuthMiddleware(http.HandlerFunc(h.handleMicropubPost)).ServeHTTP(w, r)
 	default:
 		span.RecordError(ctx, ErrMethodNotAllowed)
 		http.Error(w, ErrMethodNotAllowed.Error(), http.StatusMethodNotAllowed)

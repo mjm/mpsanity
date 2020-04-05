@@ -14,6 +14,7 @@ type MicropubHandler struct {
 	docBuilder DocumentBuilder
 	baseURL    string
 	webhookURL string
+	authz      Authorizer
 	mux        *http.ServeMux
 }
 
@@ -30,7 +31,7 @@ func New(sanity *mpsanity.Client, opts ...Option) *MicropubHandler {
 		o.Apply(h)
 	}
 
-	h.mux.HandleFunc("/micropub/media", h.handleMedia)
+	h.mux.Handle("/micropub/media", h.AuthMiddleware(http.HandlerFunc(h.handleMedia)))
 	h.mux.HandleFunc("/micropub", h.handleMicropub)
 	return h
 }
@@ -66,5 +67,17 @@ func WithBaseURL(u string) Option {
 func WithWebhookURL(u string) Option {
 	return optionFn(func(h *MicropubHandler) {
 		h.webhookURL = u
+	})
+}
+
+func WithIndieAuth(tokenEndpoint string, me string) Option {
+	return optionFn(func(h *MicropubHandler) {
+		if tokenEndpoint != "" {
+			h.authz = &IndieAuthAuthorizer{
+				TokenEndpoint: tokenEndpoint,
+				Me:            me,
+				HTTPClient:    h.Sanity.HTTPClient,
+			}
+		}
 	})
 }

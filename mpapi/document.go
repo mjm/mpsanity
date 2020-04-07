@@ -10,12 +10,14 @@ import (
 
 	"github.com/mjm/mpsanity"
 	"github.com/mjm/mpsanity/block"
+	"github.com/mjm/mpsanity/patch"
 )
 
 var ErrNotEntry = status.Error(codes.InvalidArgument, "post is not an entry")
 
 type DocumentBuilder interface {
 	BuildDocument(ctx context.Context, input *CreateInput) (Document, error)
+	UpdateDocument(ctx context.Context, input *UpdateInput) ([]patch.Patch, error)
 }
 
 type DefaultDocumentBuilder struct {
@@ -80,6 +82,30 @@ func (d *DefaultDocumentBuilder) BuildDocument(_ context.Context, input *CreateI
 	doc.Syndication = input.Syndication()
 
 	return &doc, nil
+}
+
+func (d *DefaultDocumentBuilder) UpdateDocument(ctx context.Context, input *UpdateInput) ([]patch.Patch, error) {
+	var ps []patch.Patch
+
+	if len(input.Replace.Name) > 0 {
+		ps = append(ps, patch.Set("title", input.Replace.Name[0]))
+	}
+	// TODO update content (this is kinda hard when photos are stored inside it)
+	if len(input.Replace.Syndication) > 0 {
+		ps = append(ps, patch.Set("syndication", input.Replace.Syndication))
+	}
+
+	if len(input.Add.Syndication) > 0 {
+		var items []interface{}
+		for _, u := range input.Add.Syndication {
+			items = append(items, u)
+		}
+		ps = append(ps,
+			patch.SetIfMissing("syndication", make([]string, 0)),
+			patch.InsertAfter("syndication[-1]", items...))
+	}
+
+	return ps, nil
 }
 
 type defaultDocument struct {

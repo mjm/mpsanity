@@ -15,4 +15,6 @@ var (
 	requestTypeUpdate = requestTypeKey("update")
 
 	typeKey = key.New("micropub.type").String
+	urlKey  = key.New("micropub.url").String
+	slugKey = key.New("micropub.slug").String
 )

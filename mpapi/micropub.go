@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"mime"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"go.opentelemetry.io/otel/api/key"
@@ -76,8 +75,6 @@ func (h *MicropubHandler) handleMicropubPost(w http.ResponseWriter, r *http.Requ
 }
 
 func (h *MicropubHandler) createDocument(ctx context.Context, w http.ResponseWriter, input *CreateInput) {
-	span := trace.SpanFromContext(ctx)
-
 	doc, err := h.docBuilder.BuildDocument(ctx, input)
 	if err != nil {
 		respondWithError(ctx, w, err)
@@ -89,25 +86,8 @@ func (h *MicropubHandler) createDocument(ctx context.Context, w http.ResponseWri
 		return
 	}
 
-	if h.webhookURL != "" {
-		q := url.Values{
-			"trigger_title": []string{fmt.Sprintf("Create %s", doc.URLPath())},
-		}
-		u := h.webhookURL + "?" + q.Encode()
-
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, strings.NewReader("{}"))
-		if err != nil {
-			span.RecordError(ctx, err)
-		} else {
-			req.Header.Set("Content-Type", "application/json")
-			res, err := h.Sanity.HTTPClient.Do(req)
-			if err != nil {
-				span.RecordError(ctx, err)
-			} else if res.StatusCode > 299 {
-				span.RecordError(ctx, fmt.Errorf("unexpected status code %d for webhook", res.StatusCode))
-			}
-		}
-	}
+	notifyTitle := fmt.Sprintf("Create %s", strings.Trim(doc.URLPath(), "/"))
+	h.notifyWebhook(ctx, notifyTitle)
 
 	w.Header().Set("Location", h.baseURL+doc.URLPath())
 	w.WriteHeader(http.StatusAccepted)

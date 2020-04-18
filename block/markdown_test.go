@@ -1,6 +1,7 @@
 package block
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,6 +29,7 @@ func TestMarkdownToBlocks(t *testing.T) {
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 			},
@@ -81,6 +83,7 @@ func TestMarkdownToBlocks(t *testing.T) {
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 			},
@@ -105,6 +108,7 @@ And how about _some more?_`,
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -119,6 +123,7 @@ And how about _some more?_`,
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -140,6 +145,7 @@ And how about _some more?_`,
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 			},
@@ -163,6 +169,7 @@ Let's see how they go.`,
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 			},
@@ -187,6 +194,7 @@ And a paragraph underneath
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -201,6 +209,7 @@ And a paragraph underneath
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -215,6 +224,7 @@ And a paragraph underneath
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 			},
@@ -245,6 +255,7 @@ Now there's a paragraph at the end.
 						},
 						ListItem: "bullet",
 						Level:    1,
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -261,6 +272,7 @@ Now there's a paragraph at the end.
 						},
 						ListItem: "bullet",
 						Level:    1,
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -277,6 +289,7 @@ Now there's a paragraph at the end.
 						},
 						ListItem: "bullet",
 						Level:    2,
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -293,6 +306,7 @@ Now there's a paragraph at the end.
 						},
 						ListItem: "bullet",
 						Level:    2,
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -309,6 +323,7 @@ Now there's a paragraph at the end.
 						},
 						ListItem: "bullet",
 						Level:    1,
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -325,6 +340,7 @@ Now there's a paragraph at the end.
 						},
 						ListItem: "bullet",
 						Level:    2,
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -339,6 +355,7 @@ Now there's a paragraph at the end.
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 			},
@@ -363,6 +380,7 @@ Now there's a paragraph at the end.
 						},
 						ListItem: "number",
 						Level:    1,
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -379,6 +397,7 @@ Now there's a paragraph at the end.
 						},
 						ListItem: "number",
 						Level:    1,
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -395,6 +414,7 @@ Now there's a paragraph at the end.
 						},
 						ListItem: "number",
 						Level:    1,
+						MarkDefs: []MarkDef{},
 					},
 				},
 			},
@@ -422,6 +442,7 @@ Now there's a paragraph at the end.
 						},
 						ListItem: "bullet",
 						Level:    1,
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -438,6 +459,7 @@ Now there's a paragraph at the end.
 						},
 						ListItem: "bullet",
 						Level:    1,
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -454,6 +476,7 @@ Now there's a paragraph at the end.
 						},
 						ListItem: "bullet",
 						Level:    1,
+						MarkDefs: []MarkDef{},
 					},
 				},
 			},
@@ -480,6 +503,7 @@ A paragraph in-between
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -494,6 +518,7 @@ A paragraph in-between
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -508,6 +533,7 @@ A paragraph in-between
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 			},
@@ -533,6 +559,7 @@ A following paragraph`,
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -553,6 +580,7 @@ A following paragraph`,
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 			},
@@ -573,6 +601,7 @@ A following paragraph`,
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -593,6 +622,7 @@ A following paragraph`,
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 			},
@@ -613,6 +643,7 @@ A following paragraph`,
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 				{
@@ -634,6 +665,7 @@ A following paragraph`,
 								},
 							},
 						},
+						MarkDefs: []MarkDef{},
 					},
 				},
 			},
@@ -801,6 +833,7 @@ And some more content afterwards.`)
 						},
 					},
 				},
+				MarkDefs: []MarkDef{},
 			},
 		},
 		{
@@ -821,6 +854,7 @@ And some more content afterwards.`)
 						},
 					},
 				},
+				MarkDefs: []MarkDef{},
 			},
 		},
 	}, out)
@@ -849,6 +883,7 @@ And some more content afterwards.`)
 						},
 					},
 				},
+				MarkDefs: []MarkDef{},
 			},
 		},
 		{
@@ -869,7 +904,58 @@ And some more content afterwards.`)
 						},
 					},
 				},
+				MarkDefs: []MarkDef{},
 			},
 		},
 	}, out)
+}
+
+func TestBlockJSONRoundTrip(t *testing.T) {
+	b := Block{
+		Type: "block",
+		Content: &BlockContent{
+			Style: "normal",
+			Children: []Block{
+				{
+					Type: "span",
+					Content: &SpanContent{
+						Text: "Some content",
+					},
+				},
+			},
+			MarkDefs: []MarkDef{
+				{
+					Type: "link",
+					Key:  "asdf",
+					Data: &LinkData{
+						Href: "http://example.org",
+					},
+				},
+			},
+		},
+	}
+
+	data, err := json.Marshal(b)
+	assert.NoError(t, err)
+
+	var m map[string]interface{}
+	assert.NoError(t, json.Unmarshal(data, &m))
+
+	assert.Equal(t, map[string]interface{}{
+		"_type": "block",
+		"style": "normal",
+		"children": []interface{}{
+			map[string]interface{}{
+				"_type": "span",
+				"text":  "Some content",
+			},
+		},
+		"markDefs": []interface{}{
+			map[string]interface{}{
+				"_type": "link",
+				"_key":  "asdf",
+				"href":  "http://example.org",
+			},
+		},
+	}, m)
 }

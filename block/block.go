@@ -134,6 +134,34 @@ type MarkDef struct {
 	Data
 }
 
+func (md MarkDef) MarshalJSON() ([]byte, error) {
+	m := map[string]interface{}{
+		"_type": md.Type,
+		"_key":  md.Key,
+	}
+
+	if data, ok := md.Data.(map[string]interface{}); ok {
+		for k, v := range data {
+			m[k] = v
+		}
+	} else if t := reflect.TypeOf(md.Data).Elem(); t.Kind() == reflect.Struct {
+		val := reflect.ValueOf(md.Data).Elem()
+		for i := 0; i < t.NumField(); i++ {
+			field := t.Field(i)
+			name := t.Field(i).Name
+			tagVals := strings.Split(field.Tag.Get("json"), ",")
+			if len(tagVals) > 1 && tagVals[1] == "omitempty" {
+				if val.FieldByName(name).IsZero() {
+					continue
+				}
+			}
+			m[tagVals[0]] = val.FieldByName(name).Interface()
+		}
+	}
+
+	return json.Marshal(m)
+}
+
 type LinkData struct {
 	Href string `json:"href"`
 }

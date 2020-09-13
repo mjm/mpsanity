@@ -5,14 +5,46 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"go.opentelemetry.io/otel/api/key"
 	"go.opentelemetry.io/otel/api/trace"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func (h *MicropubHandler) handleMedia(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracer.Start(r.Context(), "handleMedia")
+	defer span.End()
 
+	r.ParseMultipartForm(32 << 20)
+	if r.MultipartForm == nil {
+		respondWithError(ctx, w, status.Error(codes.InvalidArgument, "media upload requires multipart form data"))
+		return
+	}
+
+	if len(r.MultipartForm.File["file"]) != 1 {
+		respondWithError(ctx, w, status.Error(codes.InvalidArgument, "media upload should have exactly one 'file' field"))
+		return
+	}
+
+	fh := r.MultipartForm.File["file"][0]
+	f, err := fh.Open()
+	if err != nil {
+		respondWithError(ctx, w, err)
+		return
+	}
+
+	imgIDs, err := h.uploadImageAssets(ctx, []io.ReadCloser{f})
+	if err != nil {
+		respondWithError(ctx, w, err)
+		return
+	}
+
+	imgURL := h.urlForImageAsset(imgIDs[0])
+	w.Header().Set("Location", imgURL)
+	w.WriteHeader(http.StatusCreated)
 }
 
 func (h *MicropubHandler) fetchImageAssets(ctx context.Context, urls []string) ([]io.ReadCloser, error) {
@@ -80,4 +112,13 @@ func (h *MicropubHandler) uploadImageAssets(ctx context.Context, rs []io.ReadClo
 	}
 
 	return imgIDs, nil
+}
+
+func (h *MicropubHandler) urlForImageAsset(id string) string {
+	urlID := strings.TrimPrefix(id, "image-")
+	if lastDashIdx := strings.LastIndex(urlID, "-"); lastDashIdx != -1 {
+		urlID = urlID[:lastDashIdx] + "." + urlID[lastDashIdx+1:]
+	}
+
+	return fmt.Sprintf("https://cdn.sanity.io/images/%s/%s/%s", h.Sanity.ProjectID, h.Sanity.Dataset, urlID)
 }

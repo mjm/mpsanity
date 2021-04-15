@@ -46,6 +46,8 @@ func (authz *IndieAuthAuthorizer) Authorize(r *http.Request) (string, []string, 
 	expectedMe := u.Hostname()
 
 	authzHeader := r.Header.Get("Authorization")
+	span.SetAttributes(key.Int("auth.authz_header.length", len(authzHeader)))
+
 	if authzHeader == "" {
 		span.RecordError(ctx, ErrNoToken, trace.WithErrorStatus(status.Code(ErrNoToken)))
 		return "", nil, ErrNoToken

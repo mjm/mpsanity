@@ -91,9 +91,9 @@ func (mc *MarkdownConverter) ToBlocks(s string) ([]Block, error) {
 			b.AppendText("\n")
 		case blackfriday.Emph:
 			if entering {
-				b.StartMark("emphasis")
+				b.StartMark("em")
 			} else {
-				b.EndMark("emphasis")
+				b.EndMark("em")
 			}
 		case blackfriday.Strong:
 			if entering {
@@ -123,7 +123,7 @@ func (mc *MarkdownConverter) ToBlocks(s string) ([]Block, error) {
 			}
 		case blackfriday.BlockQuote:
 			if entering {
-				b.StartBlock("quote")
+				b.StartBlock("blockquote")
 			} else {
 				b.EndBlock()
 			}

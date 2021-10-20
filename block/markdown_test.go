@@ -53,7 +53,7 @@ func TestMarkdownToBlocks(t *testing.T) {
 								Type: "span",
 								Content: &SpanContent{
 									Text:  "some text",
-									Marks: []string{"emphasis"},
+									Marks: []string{"em"},
 								},
 							},
 							{
@@ -141,7 +141,7 @@ And how about _some more?_`,
 								Type: "span",
 								Content: &SpanContent{
 									Text:  "some more?",
-									Marks: []string{"emphasis"},
+									Marks: []string{"em"},
 								},
 							},
 						},
@@ -494,7 +494,7 @@ A paragraph in-between
 				{
 					Type: "block",
 					Content: &BlockContent{
-						Style: "quote",
+						Style: "blockquote",
 						Children: []Block{
 							{
 								Type: "span",
@@ -524,7 +524,7 @@ A paragraph in-between
 				{
 					Type: "block",
 					Content: &BlockContent{
-						Style: "quote",
+						Style: "blockquote",
 						Children: []Block{
 							{
 								Type: "span",
@@ -738,7 +738,7 @@ Links can be [done][] with footnotes too.
 								Type: "span",
 								Content: &SpanContent{
 									Text:  "formatting",
-									Marks: []string{"emphasis", "mark1"},
+									Marks: []string{"em", "mark1"},
 								},
 							},
 							{
